@@ -1,4 +1,5 @@
-CI/CD and Infrastructure Design for sync-service
+CI/CD and Infrastructure Design for sync-service.
+
 This document describes the CI/CD pipeline and infrastructure design for the sync-service application.  
 It ensures reliable deployments, environment isolation, and minimal downtime.
 
@@ -132,9 +133,15 @@ Logging & Monitoring
 
 ---
 
-6. Architecture Flow
+6. Architecture Diagram
 
-Developer → GitHub → Jenkins → CloudRun → MongoDB Atlas
+Developer → GitHub → Jenkins CI/CD Pipeline → Container Build (Docker)
+        → Google Cloud Run (Spring Boot Service)
+        → MongoDB Atlas (Database)
+
+Supporting Components:
+Cloud Run - GCP Secret Manager (secrets)
+Cloud Run - Cloud Logging & Monitoring (logs, metrics, alerts)
 
 ---
 
