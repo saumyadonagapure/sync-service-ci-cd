@@ -22,14 +22,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building application..."
-                sh 'echo Build successful'
+                bat 'echo Build successful'
             }
         }
 
         stage('Test') {
             steps {
                 echo "Running tests..."
-                sh 'echo Tests passed'
+                bat 'echo Tests passed'
             }
         }
 
