@@ -1,4 +1,6 @@
-CI/CD Design for sync-service
+CI/CD and Infrastructure Design for sync-service
+This document describes the CI/CD pipeline and infrastructure design for the sync-service application.  
+It ensures reliable deployments, environment isolation, and minimal downtime.
 
 1. Branching Strategy
 
@@ -30,6 +32,16 @@ Stages:
 4. Deploy
 5. Rollback (conditional)
 
+Artifact:
+- Application is built into a JAR/Docker image
+- Tagged using BUILD_NUMBER
+- Same artifact promoted across environments
+
+Deployment Execution:
+- Jenkins updates Cloud Run service with new image
+- Health checks validate deployment
+- On failure, rollback is triggered automatically
+  
 PR vs Merge Behavior
 
 - On Pull Request:
@@ -75,20 +87,15 @@ Secrets Handling
 
 4. Deployment Strategy
 
-Selected: Rolling Deployment
+Selected: No downtime
 
-- Gradual update of instances
-- No downtime
-- Cost-effective
+Rolling deployment ensures zero downtime by updating instances gradually 
+while keeping previous instances serving traffic until new ones are healthy.
 
 Zero/Minimal Downtime Strategy
 
 - Instances updated one by one
 - Service remains available during deployment
-
-Alternative:
-
-- Blue/Green deployment (not used due to higher cost)
 
 ---
 
@@ -127,7 +134,7 @@ Logging & Monitoring
 
 6. Architecture Flow
 
-User → Cloud Run → Spring Boot Service → MongoDB Atlas
+Developer → GitHub → Jenkins → CloudRun → MongoDB Atlas
 
 ---
 
