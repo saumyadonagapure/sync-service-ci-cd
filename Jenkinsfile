@@ -32,6 +32,20 @@ pipeline {
                 bat 'echo Tests passed'
             }
         }
-
+ stage('Deploy') {
+    steps {
+        echo "Deploying to ${params.ENV} environment..."
+        bat 'echo Deployment successful'
+    }
+}
+        stage('Rollback') {
+    when {
+        expression { params.ROLLBACK_TAG != '' }
+    }
+    steps {
+        echo "Rolling back to ${params.ROLLBACK_TAG}"
+        bat 'echo Rollback done'
+    }
+}
     }
 }
