@@ -1,96 +1,96 @@
-# CI/CD Design for sync-service
+CI/CD Design for sync-service
 
-## 1. Branching Strategy
+1. Branching Strategy
 
-We follow a simplified Git Flow:
+- main → Production environment
+- staging → Pre-production testing
+- feature/* → Feature development branches
 
-- feature/* → development work
-- develop → QA environment
-- staging → staging environment
-- main → production
+Flow:
 
-### Mapping
+- Developers create feature branches
+- Raise PR to staging
+- After testing → merge to main for production
 
-| Branch   | Environment |
-|----------|------------|
-| develop  | QA         |
-| staging  | Staging    |
-| main     | Production |
+Safety:
 
-### Preventing Accidental Production Deployments
-
-- main branch is protected
-- PR approval required before merge
-- Jenkins manual approval before prod deployment
-- Only tagged releases (v*) allowed for production
+- No direct commits to main
+- PR approval required for production
 
 ---
 
-## 2. Jenkins Pipeline
+2. Jenkins Pipeline
 
-### Stages
+Stages:
 
-1. Checkout code
-2. Build (Maven)
-3. Unit Testing
-4. Static Analysis (SonarQube)
-5. Build Docker Image
-6. Push Docker Image
-7. Deploy to environment
-8. Smoke Testing
+1. Checkout
+2. Build
+3. Test
+4. Deploy
+5. Rollback (conditional)
 
----
+Flow:
 
-### PR vs Merge Behavior
+- On PR → Run build & test
+- On merge → Trigger deployment
 
-- PR → build + test only (no deployment)
-- Merge to develop → deploy to QA
-- Merge to staging → deploy to staging
-- Merge to main → deploy to production (manual approval)
+Rollback:
+
+- Triggered using parameter "ROLLBACK_TAG"
+- Deploys previous stable version
 
 ---
 
-### Rollback Strategy
+3. Configuration Management
 
-- Maintain previous Docker image versions
-- Rollback using previous stable image tag
-- Manual rollback via script or Jenkins parameter
+- Environment-specific configs:
+  
+  - "qa"
+  - "staging"
+  - "prod"
 
----
+- Managed via:
+  
+  - Config files
+  - Environment variables
 
-## 3. Configuration Management
+Secrets:
 
-### Environment Config
-
-- Separate config per environment (qa, staging, prod)
-- Stored in config/*.env files
-- Injected at runtime
-
-### Secrets Handling
-
-- MongoDB credentials stored securely
-- Use Jenkins credentials / GCP Secret Manager
-- Never store secrets in code
+- Stored in Jenkins Credentials
+- Example:
+  - MongoDB URI
+  - API keys
 
 ---
 
-## 4. Deployment Strategy
+4. Deployment Strategy
 
-### Strategy: Rolling Deployment
+Chosen: Rolling Deployment
 
-- Stop old container
-- Start new container with updated image
-- Health check using /actuator/health
+- Gradual update of instances
+- No downtime
+- Simple and cost-effective
 
-### Why Rolling?
+Alternative:
 
-- Lower cost compared to Blue/Green
-- Simpler setup for VM-based deployment
+- Blue/Green (not used due to higher cost)
 
 ---
 
-### Zero Downtime Approach
+5. Rollback Strategy
 
-- Use multiple instances (if available)
-- Update instances one by one
-- Route traffic only after health check passes
+- Each build tagged using build number
+- Previous version stored
+- Rollback triggered manually using parameter
+
+---
+
+Summary
+
+This pipeline ensures:
+
+- Automated CI/CD
+- Environment-based deployments
+- Safe rollback mechanism
+- Scalable and production-ready workflow
+
