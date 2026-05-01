@@ -18,5 +18,10 @@ GitHub → Jenkins → Build → Test → Deploy → Rollback (if needed)
 - config/ → Environment configs
 - scripts/ → Deployment scripts
 
+## Architecture Diagram
+
+This architecture ensures scalability, security, and automated deployments using GCP services.
+[Architecture](architecture.png)
+
 ## Author
 Saumya Donagapure
